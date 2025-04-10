@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  repository_dispatch:
+    types: [package-created]
+
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref (e.g. refs/tags/v1.2.3)"
+        required: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create a new Github Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up environment variables
+        run: |
+          REF="${{ github.event.client_payload.ref || github.event.inputs.ref }}"
+          echo "REF=$REF" >> $GITHUB_ENV
+          
+          if [[ "$REF" == refs/heads/* ]]; then
+            VERSION="${REF#refs/heads/}"
+          elif [[ "$REF" == refs/tags/v* ]]; then
+            VERSION="${REF#refs/tags/v}"
+          else
+            VERSION="unknown"
+          fi
+
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE=ghcr.io/sessystems/live-cmaf-transcoder:$VERSION" >> $GITHUB_ENV
+          echo "IMAGE_FILENAME=sessystems-live-cmaf-transcoder-$VERSION.tar.gz" >> $GITHUB_ENV
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.REF }}
+
+      - name: Pull Docker image from GHCR
+        run: docker pull ${DOCKER_IMAGE}
+
+      - name: Save Docker Image to tar file
+        run: docker save ${DOCKER_IMAGE} | gzip > ${IMAGE_FILENAME}
+
+      - name: Upload Release Asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload v${{ env.VERSION }} ${{ env.IMAGE_FILENAME }}
+
+      - name: Publish release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit v${{ env.VERSION }} --draft=false
+

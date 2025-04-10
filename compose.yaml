@@ -1,0 +1,28 @@
+services:
+  live-cmaf-transcoder:
+    image: sessystems/live-cmaf-transcoder:latest
+    volumes:
+      - /etc/machine-id:/etc/machine-id
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id
+    ports:
+      - "8888:8888"
+    devices:
+      - "/dev/dri:/dev/dri"
+
+    network_mode: "host"
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu,video,compute,utility]
+
+volumes:
+  db:
+  data:
+  ramdisk:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs      

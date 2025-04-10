@@ -1,0 +1,19 @@
+services:
+  
+  live-cmaf-transcoder:
+    image: sessystems/live-cmaf-transcoder:latest
+    volumes:
+      - /etc/machine-id:/etc/machine-id
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id
+    ports:
+      - "8888:8888"
+    network_mode: "host"
+
+volumes:
+  db:
+  data:
+  ramdisk:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs      
