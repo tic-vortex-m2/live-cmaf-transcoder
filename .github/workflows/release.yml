@@ -1,49 +1,82 @@
 name: Release
 
 on:
-  repository_dispatch:
-    types: [package-created]
-
   workflow_dispatch:
-    inputs:
-      ref:
-        description: "Git ref (e.g. refs/tags/v1.2.3)"
-        required: true
 
 env:
   CARGO_TERM_COLOR: always
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   release:
-    name: Create a new Github Release
+    name: Create a new Release
     runs-on: ubuntu-latest
     steps:
-      - name: Set up environment variables
-        run: |
-          REF="${{ github.event.client_payload.ref || github.event.inputs.ref }}"
-          echo "REF=$REF" >> $GITHUB_ENV
-          
-          if [[ "$REF" == refs/heads/* ]]; then
-            VERSION="${REF#refs/heads/}"
-          elif [[ "$REF" == refs/tags/v* ]]; then
-            VERSION="${REF#refs/tags/v}"
-          else
-            VERSION="unknown"
-          fi
-
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "DOCKER_IMAGE=ghcr.io/sessystems/live-cmaf-transcoder:$VERSION" >> $GITHUB_ENV
-          echo "IMAGE_FILENAME=sessystems-live-cmaf-transcoder-$VERSION.tar.gz" >> $GITHUB_ENV
 
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ env.REF }}
 
-      - name: Pull Docker image from GHCR
+      - name: Set up environment variables
+        run: |
+          VERSION="$(gh release list --json isDraft,tagName --jq 'map(select(.isDraft == true)) | .[0].tagName')"
+          VERSION="${VERSION#v}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - 
+        name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install cargo-set-version
+        run: cargo install cargo-set-version
+
+      - name: Bump to new version 
+        run: |
+          cargo set-version ${VERSION}
+          cargo generate-lockfile
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git commit Cargo.lock backend/Cargo.toml  -m "Bump to version ${VERSION}"
+          git tag -a v${VERSION} -m "Release version $VERSION"
+          echo "DOCKER_IMAGE=ghcr.io/sessystems/live-cmaf-transcoder:$VERSION" >> $GITHUB_ENV
+          echo "IMAGE_FILENAME=sessystems-live-cmaf-transcoder-$VERSION.tar.gz" >> $GITHUB_ENV
+        env:  
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push changes and tag
+        run: |
+          git push origin main v${VERSION}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}  
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      -
+        name: Build and Push Docker images
+        uses: docker/bake-action@v6
+        with:
+          files: docker-bake.hcl
+          targets: all
+          push: true
+
+      - name: Pull Docker images
         run: docker pull ${DOCKER_IMAGE}
 
       - name: Save Docker Image to tar file
@@ -58,4 +91,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release edit v${{ env.VERSION }} --draft=false
-
