@@ -28,8 +28,12 @@ target "_common_labels" {
     }
 }
 
-variable "REGISTRY" {
+variable "REGISTRY_DOCKER" {
   default = "docker.io"
+}
+
+variable "REGISTRY_GITHUB" {
+  default = "ghcr.io"
 }
 
 variable "ORGREPOS" {
@@ -143,10 +147,14 @@ target "live-cmaf-transcoder" {
         nvidia-runtime = "docker-image://${item.nvidia-runtime}"
     }
     tags = [
-        "${REGISTRY}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}",
-        "${REGISTRY}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}-v${VERSION}",
-        equal("latest","${item.tag}") ? "${REGISTRY}/${ORGREPOS}/live-cmaf-transcoder:${item.tag}": "",
-        equal("latest","${item.tag}") ? "${REGISTRY}/${ORGREPOS}/live-cmaf-transcoder:${VERSION}": "",
+        "${REGISTRY_GITHUB}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}",
+        "${REGISTRY_GITHUB}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}-v${VERSION}",
+        equal("latest","${item.tag}") ? "${REGISTRY_GITHUB}/${ORGREPOS}/live-cmaf-transcoder:${item.tag}": "",
+        equal("latest","${item.tag}") ? "${REGISTRY_GITHUB}/${ORGREPOS}/live-cmaf-transcoder:${VERSION}": "",
+        "${REGISTRY_DOCKER}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}",
+        "${REGISTRY_DOCKER}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}-v${VERSION}",
+        equal("latest","${item.tag}") ? "${REGISTRY_DOCKER}/${ORGREPOS}/live-cmaf-transcoder:${item.tag}": "",
+        equal("latest","${item.tag}") ? "${REGISTRY_DOCKER}/${ORGREPOS}/live-cmaf-transcoder:${VERSION}": "",
     ] 
     matrix = {
         item = [
