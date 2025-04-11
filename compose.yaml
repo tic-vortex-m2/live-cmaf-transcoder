@@ -1,21 +1,29 @@
+x-live-cmaf-transcoder: &live-cmaf-transcoder
+  image: ghcr.io/sessystems/live-cmaf-transcoder:latest
+  volumes:
+    - /etc/machine-id:/etc/machine-id
+    - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id
+  ports:
+    - "80:8888"
+  command:
+    - "--base-url=http:/localhost"
+
 services:
+
   live-cmaf-transcoder-no-gpu:
-    image: ghcr.io/sessystems/live-cmaf-transcoder:latest
-    volumes:
-      - /etc/machine-id:/etc/machine-id
-      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id
-    ports:
-      - "8888:8888"
+    <<: *live-cmaf-transcoder
+    profiles:
+      - ''
+
+  live-cmaf-transcoder-intel-gpu:
+    <<: *live-cmaf-transcoder
     devices:
       - "/dev/dri:/dev/dri"
+    profiles:
+      - 'intel'
 
-  live-cmaf-transcoder-nvidia:
-    image: ghcr.io/sessystems/live-cmaf-transcoder:latest
-    volumes:
-      - /etc/machine-id:/etc/machine-id
-      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id
-    ports:
-      - "8888:8888"
+  live-cmaf-transcoder-gpu:
+    <<: *live-cmaf-transcoder
     devices:
       - "/dev/dri:/dev/dri"
     deploy:
@@ -25,10 +33,10 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu, video, compute, utility]
-    profiles: ["nvidia"]
+    profiles:
+      - 'gpu'
 
 volumes:
-  data:
   ramdisk:
     driver: local
     driver_opts:
