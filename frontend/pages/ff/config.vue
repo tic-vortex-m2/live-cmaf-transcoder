@@ -15,7 +15,7 @@
 
     <v-form ref="form" @submit.prevent>
       <v-row justify="center">
-        <v-col xl="7" lg="10">
+        <v-col xl="8" lg="10">
           <ff-config-input-stream v-model="config" />
 
           <ff-config-video-adaptation-sets v-model="config" />

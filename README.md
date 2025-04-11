@@ -19,20 +19,48 @@ This project is built atop a customized version of ffmpeg
 - **Hardware Acceleration**: Utilizes GPUs to speed up the encoding process.
 - **Scalability**: Distributed system capable of running on multiple machines.
 
-## Installation
 
-To install the necessary dependencies, run:
+## Getting Started
+
+Follow these instructions to set up and run the transcoder.
+
+### Prerequisites
+
+- **Docker**: Ensure that Docker and Docker Compose are installed on your machine. You can find the installation guides [here](https://docs.docker.com/get-docker/).
+- **NVIDIA Container Toolkit** (optional, for NVIDIA GPU support): If using NVIDIA GPUs, install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) on your host machine.
+
+
+### Running the Transcoder
+
+#### 1. **Without Hardware Acceleration Support**
+
+To run the live-cmaf-transcoder without GPU acceleration, use the following command:
+
 ```sh
-sudo apt-get update
-sudo apt-get install -y ffmpeg
+docker compose up
 ```
 
-## Usage
+#### 2. **With Intel GPU Support**
 
-To start the CMAF Streamer, use the following command:
+To use Intel hardware acceleration, use the command below:
+
 ```sh
-./start-streamer.sh
+docker compose --profile=intel up
 ```
+
+#### 2. **With NVidia + Intel GPU Support**
+
+For both NVIDIA and Intel GPU support.
+
+Ensure the NVIDIA Container Toolkit is installed on your host machine, then run:
+
+```sh
+docker compose --profile=gpu up
+```
+
+## User-Manual
+
+The **User Manual** is available in the project wiki. You can access it [here](https://github.com/sessystems/live-cmaf-transcoder/wiki/User%E2%80%90Manual).
 
 ## Contributing
 

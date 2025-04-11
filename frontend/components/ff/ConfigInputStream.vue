@@ -7,7 +7,7 @@
         <v-col>
           <v-text-field
             v-model="config.name"
-            label="Name of the Stream"
+            label="Stream Name"
             variant="underlined"
             density="compact"
           />
