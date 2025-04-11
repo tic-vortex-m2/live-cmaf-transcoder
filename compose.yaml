@@ -3,13 +3,13 @@ x-live-cmaf-transcoder: &live-cmaf-transcoder
   volumes:
     - /etc/machine-id:/etc/machine-id
     - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id
-    - data:/var/lib/redis
+    - data:/data
   ports:
     - "80:8888"
     - "6379:6379"
   environment:
     - "BASE_URL=${BASE_URL:-http:/localhost}"
-    - "REDIS_URL=${REDIS_URL:-redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@localhost:6379}"
+    - "REDIS_URL=${REDIS_URL:-}"
     - "RUST_LOG=warn"
       
 services:
