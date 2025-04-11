@@ -27,6 +27,7 @@ COPY --from=ffmpeg /app/ffmpeg/ffmpeg /usr/local/bin
 COPY --from=ffmpeg /app/ffmpeg/ffprobe /usr/local/bin
 COPY ./docker/redis.sh /opt/nvidia/entrypoint.d/94redis.sh
 
+RUN mkdir /data
 RUN  echo "**** clean up ****" && \
     rm -rf \
     /var/lib/apt/lists/* \
