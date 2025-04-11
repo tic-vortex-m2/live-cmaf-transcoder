@@ -10,7 +10,7 @@ x-live-cmaf-transcoder: &live-cmaf-transcoder
   environment:
     - "BASE_URL=${BASE_URL:-http:/localhost}"
     - "REDIS_URL=${REDIS_URL:-redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@localhost:6379}"
-    - "RUST_LOG="
+    - "RUST_LOG=warn"
       
 services:
 
