@@ -69,28 +69,34 @@ struct Args {
     #[arg(long, default_value = "false")]
     standard_ffmpeg: bool,
 
-    /// Live CMAF output directory
+    /// Directory to store live output files (segments and manifests)
     #[arg(long)]
     live_output: Option<std::path::PathBuf>,
 
-    /// UID of this server
+    /// The unique identifier (UID) of this server.
+    /// This can also be set through the `SERVER_UID` environment variable.
+    /// It is used to uniquely identify the server instance.
+    /// If not provided, the system's native machine ID will be used as a fallback.
     #[arg(long)]
     uid: Option<String>,
 
-    /// Name of this server
+    /// The name of this server.
+    /// This can also be set through the `SERVER_NAME` environment variable.
+    /// It is used to display the server name in the web interface.
+    /// If not provided, the system's hostname will be used as a default.
     #[arg(long)]
     name: Option<String>,
 
     /// Public base URL of this server, ex: http://localhost:8888
+    /// This can also be set through the `BASE_URL` environment variable.
     #[arg(long)]
     base_url: Option<String>,
 
     /// Redis URI redis(s)://username:password@host:port
-    #[arg(
-        long,
-        default_value = "redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@localhost:6379"
-    )]
-    redis: String,
+    /// This can also be set through the `REDIS_URL` environment variable.
+    /// If not provided, a default Redis URI redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@localhost:6379 be used.
+    #[arg(long)]
+    redis: Option<String>,
 
     /// Disable Transcoder Module
     #[arg(long, default_value = "false")]
@@ -113,30 +119,45 @@ async fn main() -> std::io::Result<()> {
     let base_url = args
         .base_url
         .clone()
+        .or_else(|| env::var("BASE_URL").ok())
         .unwrap_or_else(|| format!("http://{}:{}", local_ip_address::local_ip().unwrap(), port));
 
     url::Url::parse(&base_url)
         .unwrap_or_else(|_| panic!("baseURL {} is not a valid URL", base_url));
 
-    let server_uid = args.uid.clone().unwrap_or_else(|| {
-        let id = machine_uid::get().expect("Server UID not found");
-        let mut s = DefaultHasher::new();
-        id.hash(&mut s);
-        s.finish().to_string()
-    });
+    let server_uid = args
+        .uid
+        .clone()
+        .or_else(|| env::var("SERVER_UID").ok())
+        .unwrap_or_else(|| {
+            let id = machine_uid::get().expect("Server UID not found");
+            let mut s = DefaultHasher::new();
+            id.hash(&mut s);
+            s.finish().to_string()
+        });
 
-    let server_name = args.name.clone().unwrap_or_else(|| {
-        hostname::get()
-            .expect("Fail to get hostname")
-            .into_string()
-            .expect("Fail to convert hostname to string")
-    });
+    let server_name = args
+        .name
+        .clone()
+        .or_else(|| env::var("SERVER_NAME").ok())
+        .unwrap_or_else(|| {
+            hostname::get()
+                .expect("Fail to get hostname")
+                .into_string()
+                .expect("Fail to convert hostname to string")
+        });
 
     tracing::info!("Base URL: {}", base_url);
     tracing::info!("Server UID: {}", server_uid);
     tracing::info!("Server Name: {}", server_name);
 
-    let mut redis = match crate::db::dbredis::DBRedis::new(&args.redis).await {
+    let redis_url = args
+        .redis
+        .clone()
+        .or_else(|| env::var("REDIS_URL").ok())
+        .unwrap_or_else(|| "redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@localhost:6379".to_string());
+
+    let mut redis = match crate::db::dbredis::DBRedis::new(&redis_url).await {
         Ok(redis) => redis,
         Err(e) => {
             tracing::error!("Fail to connect to redis database: {}", e);
