@@ -12,6 +12,7 @@ x-live-cmaf-transcoder: &live-cmaf-transcoder
     - "SERVER_NAME=${SERVER_NAME:-}"
     - "SERVER_UID=${SERVER_UID:-}"
     - "REDIS_URL=${REDIS_URL:-}"
+    - "REDIS_SERVICE_DISABLED=${REDIS_SERVICE_DISABLED:-false}"
     - "RUST_LOG=warn"
       
 services:
