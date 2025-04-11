@@ -27,8 +27,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - 
-        name: Set up Rust
+      - name: Set up Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -36,12 +35,17 @@ jobs:
       - name: Install cargo-set-version
         run: cargo install cargo-set-version
 
+      - name: Run Tests
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+
       - name: Bump to new version 
         run: |
           cargo set-version ${VERSION}
           cargo generate-lockfile
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
           git commit Cargo.lock backend/Cargo.toml  -m "Bump to version ${VERSION}"
           git tag -a v${VERSION} -m "Release version $VERSION"
           echo "DOCKER_IMAGE=ghcr.io/sessystems/live-cmaf-transcoder:$VERSION" >> $GITHUB_ENV
@@ -80,7 +84,7 @@ jobs:
         run: docker pull ${DOCKER_IMAGE}
 
       - name: Save Docker Image to tar file
-        run: docker save ${DOCKER_IMAGE} | gzip > ${IMAGE_FILENAME}
+        run: docker save ${DOCKER_IMAGE} | xz -T0 -c > ${IMAGE_FILENAME}
 
       - name: Upload Release Asset
         env:
