@@ -168,7 +168,7 @@ async fn main() -> std::io::Result<()> {
         .or_else(|| get_env("REDIS_URL"))
         .or_else(|| {
             let password = get_env("REDIS_PASSWORD")?;
-            Some(format!("redis://:{}:6379", password))
+            Some(format!("redis://:{}@localhost:6379", password))
         })
         .unwrap_or_else(|| "redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@localhost:6379".to_string());
 
