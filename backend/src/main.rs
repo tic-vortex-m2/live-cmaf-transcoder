@@ -94,7 +94,7 @@ struct Args {
 
     /// Redis URI redis(s)://username:password@host:port
     /// This can also be set through the `REDIS_URL` environment variable.
-    /// If not provided, a default Redis URI redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@localhost:6379 be used.
+    /// If not provided, a default Redis URI redis://:${REDIS_PASSWORD:-eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81}@localhost:6379 be used.
     #[arg(long)]
     redis: Option<String>,
 
@@ -166,6 +166,10 @@ async fn main() -> std::io::Result<()> {
         .redis
         .clone()
         .or_else(|| get_env("REDIS_URL"))
+        .or_else(|| {
+            let password = get_env("REDIS_PASSWORD")?;
+            Some(format!("redis://:{}:6379", password))
+        })
         .unwrap_or_else(|| "redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@localhost:6379".to_string());
 
     let mut redis = match crate::db::dbredis::DBRedis::new(&redis_url).await {
