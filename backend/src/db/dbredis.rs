@@ -24,7 +24,10 @@ impl DBRedis {
             )
         })?;
 
-        let con = ConnectionManager::new(client).await.map_err(|e| {
+        let timeout_duration = std::time::Duration::from_secs(5);
+        let con_result =
+            tokio::time::timeout(timeout_duration, ConnectionManager::new(client)).await?;
+        let con: ConnectionManager = con_result.map_err(|e| {
             new_io_error!(
                 std::io::ErrorKind::Other,
                 format!("Fail to open redis {}", e)
