@@ -18,8 +18,8 @@ sed -i 's/^notify-keyspace-events.*/notify-keyspace-events KEA/' "$REDIS_CONF"
 sed -i 's/^bind.*/# bind/' "$REDIS_CONF"
 sed -i 's|^?dir .*|dir /data|' "$REDIS_CONF"
 
-if [ -z "$REDIS_DISABLED" ]; then
-  service redis-server start
-else
+if [ "$REDIS_SERVICE_DISABLED" = "true" ] || [ "$REDIS_SERVICE_DISABLED" = "1" ]; then
   echo "Redis is disabled. Skipping start."
+else
+  service redis-server start
 fi
