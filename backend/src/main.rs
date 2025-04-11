@@ -103,9 +103,20 @@ struct Args {
     disable_transcoder: bool,
 }
 
+fn get_env(key: &str) -> Option<String> {
+    let env = env::var(key).ok()?;
+    match env.is_empty() {
+        true => None,
+        false => Some(env),
+    }
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    tracing_subscriber::fmt().with_line_number(true).init();
+    tracing_subscriber::fmt()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .with_line_number(true)
+        .init();
     let args = Args::parse();
 
     let port: u16 = args
@@ -119,7 +130,7 @@ async fn main() -> std::io::Result<()> {
     let base_url = args
         .base_url
         .clone()
-        .or_else(|| env::var("BASE_URL").ok())
+        .or_else(|| get_env("BASE_URL"))
         .unwrap_or_else(|| format!("http://{}:{}", local_ip_address::local_ip().unwrap(), port));
 
     url::Url::parse(&base_url)
@@ -128,7 +139,7 @@ async fn main() -> std::io::Result<()> {
     let server_uid = args
         .uid
         .clone()
-        .or_else(|| env::var("SERVER_UID").ok())
+        .or_else(|| get_env("SERVER_UID"))
         .unwrap_or_else(|| {
             let id = machine_uid::get().expect("Server UID not found");
             let mut s = DefaultHasher::new();
@@ -139,7 +150,7 @@ async fn main() -> std::io::Result<()> {
     let server_name = args
         .name
         .clone()
-        .or_else(|| env::var("SERVER_NAME").ok())
+        .or_else(|| get_env("SERVER_NAME"))
         .unwrap_or_else(|| {
             hostname::get()
                 .expect("Fail to get hostname")
@@ -154,7 +165,7 @@ async fn main() -> std::io::Result<()> {
     let redis_url = args
         .redis
         .clone()
-        .or_else(|| env::var("REDIS_URL").ok())
+        .or_else(|| get_env("REDIS_URL"))
         .unwrap_or_else(|| "redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@localhost:6379".to_string());
 
     let mut redis = match crate::db::dbredis::DBRedis::new(&redis_url).await {
