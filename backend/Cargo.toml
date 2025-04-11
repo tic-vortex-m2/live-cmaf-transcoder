@@ -14,13 +14,13 @@ rust-version = "1.70.0"
 # description — A description of the package.
 description = "CMAF Streamer transcode live streams into the Common Media Application Format (CMAF)."
 # documentation — URL of the package documentation.
-documentation = "https://github.com/sessystemsemgineering/live-cmaf-transcoder/doc"
+documentation = "https://github.com/sessystems/live-cmaf-transcoder/wiki"
 # readme — Path to the package’s README file.
 readme = "../README.md"
 # homepage — URL of the package homepage.
-homepage = "https://github.com/sessystemsemgineering/live-cmaf-transcoder"
+homepage = "https://github.com/sessystems/live-cmaf-transcoder"
 # repository — URL of the package source repository.
-repository = "https://github.com/sessystemsemgineering/live-cmaf-transcoder"
+repository = "https://github.com/sessystems/live-cmaf-transcoder    "
 # license — The package license.
 license = "Apache 2.0"
 # keywords — Keywords for the package.
