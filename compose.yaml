@@ -1,3 +1,25 @@
+##
+# Docker Compose Configuration for Live CMAF Transcoder
+#
+# USAGE:
+#
+# 1. **Run without GPU acceleration (software-only mode)**:
+#    This runs the transcoder using CPU-only encoding.
+#    Suitable for environments without GPU support.
+#    $ docker compose up
+#
+# 2. **Run with Intel GPU support**:
+#    Enables hardware acceleration using Intel iGPU via VAAPI.
+#    Requires access to /dev/dri on the host.
+#    $ docker compose --profile intel up 
+#
+# 3. **Run with Intel + NVIDIA GPU support**:
+#    Enables hardware acceleration using both Intel and NVIDIA GPUs.
+#    NVIDIA container toolkit must be installed on the host.
+#    $ docker compose --profile gpu up 
+#
+##
+
 x-live-cmaf-transcoder: &live-cmaf-transcoder
   image: ghcr.io/sessystems/live-cmaf-transcoder:latest
   volumes:

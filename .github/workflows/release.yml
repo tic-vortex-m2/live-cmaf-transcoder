@@ -83,10 +83,15 @@ jobs:
       - name: Save Docker Image to tar file
         run: docker save ${DOCKER_IMAGE} | xz -T0 -c > ${IMAGE_FILENAME}
 
-      - name: Upload Release Asset
+      - name: Upload Docker image to Assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload v${{ env.VERSION }} ${{ env.IMAGE_FILENAME }}
+
+      - name: Upload compose.yml to Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload v${{ env.VERSION }} compose.yml
 
       - name: Publish release
         env:
