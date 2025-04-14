@@ -60,7 +60,7 @@ docker compose --profile=gpu up
 
 ## User-Manual
 
-The **User Manual** is available in the project wiki. You can access it [here](https://github.com/sessystems/live-cmaf-transcoder/wiki/User%E2%80%90Manual).
+The **User Manual** is available in the project wiki. You can access it [here](https://github.com/sessystems/live-cmaf-transcoder/wiki).
 
 ## Contributing
 
