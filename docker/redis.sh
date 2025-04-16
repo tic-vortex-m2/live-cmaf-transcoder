@@ -1,9 +1,9 @@
 #!/usr/bin/sh
 
-REDIS_PASSWORD="${REDIS_PASSWORD:-eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81}"
+REDIS_PASSWORD="${REDIS_PASSWORD}"
 REDIS_CONF="/etc/redis/redis.conf"
 
-if grep -q "^requirepass " "$REDIS_CONF"; then
+if   grep -q "^requirepass " "$REDIS_CONF"; then
   sed -i "s/^requirepass .*/requirepass $REDIS_PASSWORD/" "$REDIS_CONF"
 else
   echo "requirepass $REDIS_PASSWORD" >> "$REDIS_CONF"
