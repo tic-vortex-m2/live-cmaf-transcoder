@@ -46,7 +46,11 @@ jobs:
           cargo generate-lockfile
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git commit Cargo.lock backend/Cargo.toml  -m "Bump to version ${VERSION}"
+          if ! git diff --cached --quiet; then
+            git commit Cargo.lock backend/Cargo.toml  -m "Bump to version ${VERSION}"
+          else 
+            echo "No changes to commit"
+          fi
           git tag -a v${VERSION} -m "Release version $VERSION"
           echo "DOCKER_IMAGE=ghcr.io/sessystems/live-cmaf-transcoder:$VERSION" >> $GITHUB_ENV
           echo "IMAGE_FILENAME=sessystems-live-cmaf-transcoder-$VERSION.tar.gz" >> $GITHUB_ENV
