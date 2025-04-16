@@ -35,6 +35,10 @@ Follow these instructions to set up and run the transcoder.
 
 Get the latest `compose.yaml` file from the [latest Releases](https://github.com/sessystems/live-cmaf-transcoder/releases/latest) of the project.
 
+```
+curl -L -O https://github.com/sessystems/live-cmaf-transcoder/releases/latest/download/compose.yaml
+```
+
 #### 2. Pull the Latest Docker Image
 
 Open a terminal in the same directory as your compose.yaml file and run the following command in order to get the latest version of the project:
@@ -116,7 +120,7 @@ BASE_URL=http://192.168.1.1 \
 SERVER_NAME="Server 1" \
 SERVER_UID=1 \
 REDIS_PASSWORD=1234 \
-docker compose up
+docker compose --profile=gpu up
 ```
 
 #### Step 2 — Join Server 2 to the Cluster
@@ -129,7 +133,7 @@ SERVER_UID=2 \
 REDIS_URL=redis://:1234@192.168.1.1:6379 \
 REDIS_SERVICE_DISABLED=true \
 SERVER_PORT=81 \
-docker compose up
+docker compose --profile=gpu up
 ```
 
 REDIS_URL points to the external Redis instance on **Server 1**.
