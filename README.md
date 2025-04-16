@@ -136,9 +136,9 @@ SERVER_PORT=81 \
 docker compose --profile=gpu up
 ```
 
-REDIS_URL points to the external Redis instance on **Server 1**.
+`REDIS_URL` points to the external Redis instance on **Server 1**.
 
-REDIS_SERVICE_DISABLED=true disables the internal Redis server on **Server 2**.
+`REDIS_SERVICE_DISABLED=true` disables the internal Redis server on **Server 2**.
 
 #### Step 3 — Access the Web UI
 
