@@ -27,8 +27,21 @@ Follow these instructions to set up and run the transcoder.
 ### Prerequisites
 
 - **Docker**: Ensure that Docker and Docker Compose are installed on your machine. You can find the installation guides [here](https://docs.docker.com/get-docker/).
+- **Docker compose**: Used to define and manage multi-container applications.
 - **NVIDIA Container Toolkit** (optional, for NVIDIA GPU support): If using NVIDIA GPUs, install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) on your host machine.
 
+
+#### 1. Download compose.yaml
+
+Get the latest `compose.yaml` file from the [latest Releases](https://github.com/sessystems/live-cmaf-transcoder/releases/latest) of the project.
+
+#### 2. Pull the Latest Docker Image
+
+Open a terminal in the same directory as your compose.yaml file and run the following command in order to get the latest version of the project:
+
+```
+docker compose pull
+```
 
 ### Running the Transcoder using Docker Compose
 
