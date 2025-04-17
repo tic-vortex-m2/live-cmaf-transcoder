@@ -17,7 +17,7 @@
   "dependencies": {
     "@nuxt/icon": "^1.10.1",
     "jb-videojs-hls-quality-selector": "^2.0.2",
-    "nuxt": "^3.14.1592",
+    "nuxt": "^3.16.2",
     "video.js": "^8.21.0",
     "videojs-contrib-quality-levels": "^4.1.0",
     "vue": "^3.4.21",
