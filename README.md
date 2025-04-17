@@ -35,7 +35,7 @@ Follow these instructions to set up and run the transcoder.
 
 Get the latest `compose.yaml` file from the [latest Releases](https://github.com/sessystems/live-cmaf-transcoder/releases/latest) of the project.
 
-```
+```sh
 curl -L -O https://github.com/sessystems/live-cmaf-transcoder/releases/latest/download/compose.yaml
 ```
 
@@ -43,7 +43,7 @@ curl -L -O https://github.com/sessystems/live-cmaf-transcoder/releases/latest/do
 
 Open a terminal in the same directory as your compose.yaml file and run the following command in order to get the latest version of the project:
 
-```
+```sh
 docker compose pull
 ```
 
