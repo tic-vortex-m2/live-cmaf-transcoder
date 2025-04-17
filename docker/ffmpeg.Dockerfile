@@ -1,7 +1,7 @@
 FROM cmaf-dev
 ARG FFMEPG_BRANCH
 WORKDIR /app/ffmpeg
-ADD https://github.com/xscholtes/FFmpeg/archive/refs/heads/patched/${FFMEPG_BRANCH}.zip .
+ADD https://github.com/sessystems/FFmpeg/archive/refs/heads/patched/${FFMEPG_BRANCH}.zip .
 RUN unzip ${FFMEPG_BRANCH}.zip && FFMEPGDIR=$(find  -maxdepth 1 -type d |grep -i mpeg) && mv $FFMEPGDIR/* . && rm -rf $FFMEPGDIR
 RUN ./configure --enable-static --disable-doc \
 --extra-ldflags='-Wl,-rpath,/usr/local/cuda-12.4/targets/x86_64-linux/lib -L/usr/local/cuda-12.4/targets/x86_64-linux/lib' \

@@ -148,13 +148,13 @@ target "live-cmaf-transcoder" {
     }
     tags = [
         "${REGISTRY_GITHUB}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}",
-        "${REGISTRY_GITHUB}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}-v${VERSION}",
+        notequal("",VERSION) ? "${REGISTRY_GITHUB}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}-v${VERSION}": "",
         equal("latest","${item.tag}") ? "${REGISTRY_GITHUB}/${ORGREPOS}/live-cmaf-transcoder:${item.tag}": "",
-        equal("latest","${item.tag}") ? "${REGISTRY_GITHUB}/${ORGREPOS}/live-cmaf-transcoder:${VERSION}": "",
+        notequal("",VERSION) && equal("latest","${item.tag}") ? "${REGISTRY_GITHUB}/${ORGREPOS}/live-cmaf-transcoder:${VERSION}": "",
         "${REGISTRY_DOCKER}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}",
-        "${REGISTRY_DOCKER}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}-v${VERSION}",
+        notequal("",VERSION) ? "${REGISTRY_DOCKER}/${ORGREPOS}/live-cmaf-transcoder:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}-v${VERSION}": "",
         equal("latest","${item.tag}") ? "${REGISTRY_DOCKER}/${ORGREPOS}/live-cmaf-transcoder:${item.tag}": "",
-        equal("latest","${item.tag}") ? "${REGISTRY_DOCKER}/${ORGREPOS}/live-cmaf-transcoder:${VERSION}": "",
+        notequal("",VERSION) && equal("latest","${item.tag}") ? "${REGISTRY_DOCKER}/${ORGREPOS}/live-cmaf-transcoder:${VERSION}": "",
     ] 
     matrix = {
         item = [
