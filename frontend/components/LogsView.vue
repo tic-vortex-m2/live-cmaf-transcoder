@@ -67,7 +67,7 @@ const logs: Ref<Array<Log>> = ref([]);
 const info = ref(true);
 const warning = ref(true);
 const error = ref(true);
-const refresh_id = ref();
+const refreshId = ref();
 
 const logs_filters = computed(() => {
   return logs.value.filter((log) => {
@@ -99,27 +99,27 @@ function date(timestamp: bigint) {
   return new Date(Number(timestamp) * 1000).toLocaleString();
 }
 
-async function refresh() {
+async function startRefresh() {
   logs.value = await api.getLogs(_props.serverUid, _props.configUid);
 }
 
 onBeforeUnmount(() => {
-  if (refresh_id.value !== undefined) {
-    clearTimeout(refresh_id.value);
+  if (refreshId.value) {
+    clearTimeout(refreshId.value);
   }
 });
 
 function getlogs() {
 
-  refresh_id.value = setTimeout(async () => {
-    await refresh();
+  refreshId.value = setTimeout(async () => {
+    await startRefresh();
     getlogs();
   }, 3000);
 }
 
 
 onMounted(async () => {
-  refresh();
+  startRefresh();
   getlogs();
 });
 

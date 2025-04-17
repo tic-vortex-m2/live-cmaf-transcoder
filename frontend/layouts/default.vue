@@ -167,7 +167,7 @@ function goToPrev() {
 onMounted(() => {
   ffapi.refresh_configs();
   ffapi.refresh_status();
-  api.refresh_servers();
+  api.refreshServers();
   api.refreshServerStatus();
   refreshFFStatus.value = setInterval(
     async () => await ffapi.refresh_status(),
