@@ -36,6 +36,8 @@ x-live-cmaf-transcoder: &live-cmaf-transcoder
     - "REDIS_URL=${REDIS_URL:-}"
     - "REDIS_SERVICE_DISABLED=${REDIS_SERVICE_DISABLED:-false}"
     - "REDIS_PASSWORD=${REDIS_PASSWORD:-eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81}"
+    - "DISABLE_TRANSCODER=${DISABLE_TRANSCODER:-}"
+    - "DISABLE_UI=${DISABLE_UI:-}"
     - "RUST_LOG=warn"
       
 services:

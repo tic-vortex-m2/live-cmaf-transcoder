@@ -103,6 +103,8 @@ The following environment variables can be used with Docker Compose to configure
 | `REDIS_SERVICE_DISABLED` | Disables the internal Redis container when set to `'true'` or `'1'`.<br>Useful when connecting to an external Redis via `REDIS_URL`. | `REDIS_SERVICE_DISABLED=true REDIS_URL=redis://192.168.1.1:6379 docker compose up` |
 | `REDIS_PASSWORD`       | Password for securing the internal Redis instance.<br>Only applies when using the internal Redis container.  | `REDIS_PASSWORD=1234 docker compose up` |
 | `REDIS_PORT`          | Port on which the redis server will be exposed by Docker Compose.<br>If not set, defaults to `6379`. | `REDIS_PORT=6380 docker compose up` |
+| `DISABLE_TRANSCODER`  | Set to `true` to run the server without transcoder capability. Useful to serve only the management UI. | `DISABLE_TRANSCODER=true docker compose up` |
+| `DISABLE_UI`  | Set to `true` to disable the management UI. Useful for joining a cluster that already includes a UI server. | `DISABLE_UI=true docker compose up` |
 
 ### Setting Up a Cluster of Transcoders
 
@@ -133,18 +135,20 @@ docker compose --profile=gpu up
 
 Run the following command on **Server 2** to connect it to the cluster using the Redis instance on Server 1:
 
-```BASE_URL=http://192.168.1.2 \
+```bash
+BASE_URL=http://192.168.1.2 \
 SERVER_NAME="Server 2" \
 SERVER_UID=2 \
 REDIS_URL=redis://:1234@192.168.1.1:6379 \
 REDIS_SERVICE_DISABLED=true \
+DISABLE_UI=true \
 SERVER_PORT=81 \
 docker compose --profile=gpu up
 ```
 
-`REDIS_URL` points to the external Redis instance on **Server 1**.
-
-`REDIS_SERVICE_DISABLED=true` disables the internal Redis server on **Server 2**.
+`REDIS_URL` points to the external Redis instance on **Server 1**.  
+`REDIS_SERVICE_DISABLED=true` disables the internal Redis server on **Server 2**.  
+`DISABLE_UI=true` disables the management UI on **Server 2**.  
 
 #### Step 3 — Access the Web UI
 
