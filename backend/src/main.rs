@@ -99,8 +99,12 @@ struct Args {
     redis: Option<String>,
 
     /// Disable Transcoder Module
-    #[arg(long, default_value = "false")]
-    disable_transcoder: bool,
+    #[arg(long)]
+    disable_transcoder: Option<bool>,
+
+    /// Disable the User Interface
+    #[arg(long)]
+    disable_ui: Option<bool>,
 }
 
 fn get_env(key: &str) -> Option<String> {
@@ -189,8 +193,28 @@ async fn main() -> std::io::Result<()> {
 
     let mut service_capability = Vec::new();
 
-    if !args.disable_transcoder {
+    let disable_transcoder = args
+        .disable_transcoder
+        .or_else(|| match get_env("DISABLE_TRANSCODER") {
+            Some(value) => value.parse::<bool>().ok(),
+            None => None,
+        })
+        .unwrap_or(false);
+
+    let disable_ui = args
+        .disable_ui
+        .or_else(|| match get_env("DISABLE_UI") {
+            Some(value) => value.parse::<bool>().ok(),
+            None => None,
+        })
+        .unwrap_or(false);
+
+    if !disable_transcoder {
         service_capability.push(ServerCapability::Transcode)
+    }
+
+    if !disable_ui {
+        service_capability.push(ServerCapability::UserInterface)
     }
 
     let server_info = server::Server::new(
@@ -226,7 +250,7 @@ async fn main() -> std::io::Result<()> {
     let core = core::Core::new(
         &live_output_dir,
         redis.clone(),
-        match args.disable_transcoder {
+        match disable_transcoder {
             true => None,
             false => Some(args.ffmpeg.clone()),
         },
@@ -269,32 +293,39 @@ async fn main() -> std::io::Result<()> {
             .allowed_methods(vec!["GET", "POST", "OPTIONS"])
             .allowed_header(http::header::CONTENT_TYPE);
 
-        let (app, openapi) = App::new()
+        let mut app = App::new()
             .wrap(Logger::default())
             .app_data(web::Data::new(core.clone()))
             .wrap(actix_web::middleware::Compress::default())
             .wrap(middleware::DefaultHeaders::new().add(("Cache-Control", "no-cache")))
             .wrap(cors)
             .into_utoipa_app()
-            .openapi(ApiDoc::openapi())
-            .service(
+            .openapi(ApiDoc::openapi());
+
+        if !disable_ui {
+            app = app.service(
                 utoipa_actix_web::scope("/api")
                     .service(api::get_all_servers)
                     .service(api::get_all_server_status)
                     .service(api::remove_server)
                     .service(api::get_logs)
                     .service(ffapi::service()),
-            )
-            .split_for_parts();
+            );
+        }
 
-        app.service(
-            SwaggerUi::new("/swagger-ui/{_:.*}")
-                .config(Config::default())
-                .url("/api-docs/openapi.json", openapi.clone()),
-        )
-        .service(frontend::index)
-        .service(frontend::embedded_file)
-        .service(cmaf_service)
+        let (mut app, openapi) = app.split_for_parts();
+        if !disable_ui {
+            app = app
+                .service(
+                    SwaggerUi::new("/swagger-ui/{_:.*}")
+                        .config(Config::default())
+                        .url("/api-docs/openapi.json", openapi.clone()),
+                )
+                .service(frontend::index)
+                .service(frontend::embedded_file)
+        }
+
+        app.service(cmaf_service)
     })
     .bind(&args.bind_addr)
     .unwrap()

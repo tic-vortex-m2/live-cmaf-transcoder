@@ -115,7 +115,7 @@ impl Gpu {
 #[derive(Clone, Deserialize, Serialize, Debug, Copy, ToSchema)]
 pub enum ServerCapability {
     Transcode,
-    DVBI,
+    UserInterface
 }
 
 #[derive(Clone, Deserialize, Serialize, Debug, ToSchema)]
