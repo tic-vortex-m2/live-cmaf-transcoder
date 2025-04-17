@@ -78,16 +78,16 @@ async function onCreate() {
   }
 
   const output = "/live/" + title.value.toString()
-      .replace(" ", "_")
-      .replace("/", "_")
-      .replace("\\", "_")
-      .replace(":", "_")
-      .replace("*", "_")
-      .replace("?", "_")
-      .replace("\"", "_")
-      .replace("<", "_")
-      .replace(">", "_")
-      .replace("|", "_");
+      .replaceAll(" ", "_")
+      .replaceAll("/", "_")
+      .replaceAll("\\", "_")
+      .replaceAll(":", "_")
+      .replaceAll("*", "_")
+      .replaceAll("?", "_")
+      .replaceAll("\"", "_")
+      .replaceAll("<", "_")
+      .replaceAll(">", "_")
+      .replaceAll("|", "_");
 
   const configUid = await ffapi.create(_props.serverUid, title.value.toString(), output);
   await navigateTo("/ff/config?configUid=" + configUid);
