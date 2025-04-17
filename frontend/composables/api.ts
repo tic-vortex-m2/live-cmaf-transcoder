@@ -7,7 +7,7 @@ export const useApi = () => {
   const runtimeConfig = useRuntimeConfig()
   const serverApi = new ServersApi(new Configuration({basePath: runtimeConfig.public.apiBase}));
 
-  async function refresh_servers() {
+  async function refreshServers() {
     const response: OutGetAllServers = await serverApi.getAllServers();
     response.servers.sort((a, b) => a.name.localeCompare(b.name));
     servers.value = response.servers;
@@ -35,11 +35,11 @@ export const useApi = () => {
     };
 
     await serverApi.removeServer(request);
-    await refresh_servers();
+    await refreshServers();
   }
 
   return {
-    refresh_servers, refreshServerStatus,
+    refreshServers, refreshServerStatus,
     removeServer,
     getLogs
   };

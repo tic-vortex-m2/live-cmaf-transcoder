@@ -40,11 +40,24 @@
           {{ utils.formatBytes(Number(serverStatus?.totalMemory ?? 0)) }}
         </v-col>
       </v-row>
+      <v-row v-if="!hasTranscodeCapability && hasUICapability">
+        <v-col>      
+          <NuxtLink
+          v-if="hasUICapability"
+          target="_blank"
+          class="text-info"
+          :to="serverURL"
+        >
+          Management UI
+          </NuxtLink>
+        </v-col>
+      </v-row>
       <ff-overview
         v-if="hasTranscodeCapability"
         :server-uid="_props.serverUid"
         :nb-cpus="serverStatus?.nbCpus ?? 0"
       />
+      
     </v-card-text>
   </v-card>
 </template>

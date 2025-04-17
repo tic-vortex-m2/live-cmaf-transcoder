@@ -2,13 +2,13 @@
   <v-container fluid>
     <v-row>
       <v-col>
-        <h4>CMAF Live Stream Transcoder</h4>
+        <h4>Live CMAF Transcoder</h4>
       </v-col>
     </v-row>
 
     <v-row>
       <v-col>
-        <p>The CMAF Live Stream Transcoder is designed for real-time transcoding of live video sources into CMAF formats (MPEG-DASH, HLS).</p> 
+        <p>The Live CMAF Transcoder is designed to transcode live video sources into CMAF formats (MPEG-DASH, HLS) in real-time.</p> 
       </v-col>
     </v-row>
 
