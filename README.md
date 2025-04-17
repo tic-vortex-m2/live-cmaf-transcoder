@@ -57,6 +57,7 @@ docker compose pull
 To run the live-cmaf-transcoder without GPU acceleration, use the following command:
 
 ```sh
+export BASE_URL="http://$(ip route get 1 | awk '{print $7}')" # Get IP of the default interface
 docker compose up
 ```
 
@@ -65,6 +66,7 @@ docker compose up
 To use Intel hardware acceleration, use the command below:
 
 ```sh
+export BASE_URL="http://$(ip route get 1 | awk '{print $7}')" # Get IP of the default interface
 docker compose --profile=intel up
 ```
 
@@ -75,6 +77,7 @@ For both NVIDIA and Intel GPU support.
 Ensure the NVIDIA Container Toolkit is installed on your host machine, then run:
 
 ```sh
+export BASE_URL="http://$(ip route get 1 | awk '{print $7}')" # Get IP of the default interface
 docker compose --profile=gpu up
 ```
 
