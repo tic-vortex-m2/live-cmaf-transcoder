@@ -32,7 +32,7 @@ impl FFCommand {
         gpu: &Gpu,
         config: &ffconfig::FFConfig,
         base_output: &std::path::Path,
-        modified: bool,
+        ast_delay_us_supported: bool,
     ) -> Self {
         let output = base_output.join(config.output.strip_prefix("/").unwrap_or(&config.output));
         let output_dash = output.join("manifest.mpd");
@@ -207,7 +207,7 @@ impl FFCommand {
             args.push(utc_timing_url.to_string());
         }
 
-        if modified {
+        if ast_delay_us_supported {
             args.push("-ast_delay_us".to_string());
             args.push(format!(
                 "{}",

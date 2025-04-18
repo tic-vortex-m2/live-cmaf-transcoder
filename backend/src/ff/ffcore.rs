@@ -5,30 +5,22 @@ use std::{
 
 use crate::model::server::Server;
 
-use super::{ffdb, ffprocess};
+use super::{ffdb, ffmpegbin::FFmpegBinList, ffprocess};
 
 #[derive(Clone)]
 pub struct FFCore {
     pub cores: Arc<Mutex<HashMap<String, ffprocess::FFProcessHolder>>>,
     pub output: std::path::PathBuf,
-    pub ffmpeg: String,
-    pub modified_ffmpeg: bool,
+    pub ffmpegs: FFmpegBinList,
     pub server_info: Server,
 }
 
 impl FFCore {
-    pub fn new(
-        output: &std::path::Path,
-        ffmpeg: String,
-        modified_ffmpeg: bool,
-        server_info: Server,
-    ) -> Self {
+    pub fn new(output: &std::path::Path, ffmpegs: FFmpegBinList, server_info: Server) -> Self {
         Self {
             cores: Arc::new(Mutex::new(HashMap::new())),
             output: output.to_path_buf(),
-
-            ffmpeg,
-            modified_ffmpeg,
+            ffmpegs,
             server_info,
         }
     }
@@ -41,8 +33,7 @@ impl FFCore {
                 config.uid.clone(),
                 ffdb.clone(),
                 self.output.clone(),
-                self.ffmpeg.clone(),
-                self.modified_ffmpeg,
+                self.ffmpegs.clone(),
             );
             core.get().refresh().await;
             self.cores.lock().unwrap().insert(config.uid.clone(), core);
@@ -72,8 +63,7 @@ impl FFCore {
             config_uid.to_owned(),
             ffdb.clone(),
             self.output.clone(),
-            self.ffmpeg.clone(),
-            self.modified_ffmpeg,
+            self.ffmpegs.clone(),
         );
 
         new_core.get().refresh().await;

@@ -1138,6 +1138,7 @@ dependencies = [
  "nix",
  "num_cpus",
  "redis",
+ "regex",
  "rust-embed",
  "serde",
  "serde_json",

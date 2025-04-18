@@ -23,7 +23,7 @@ impl Display for Colorspace {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize, Debug, ToSchema)]
+#[derive(Clone, Deserialize, Serialize, Debug, Copy, PartialEq, ToSchema)]
 pub enum VideoEncoder {
     H264,
     HEVC,

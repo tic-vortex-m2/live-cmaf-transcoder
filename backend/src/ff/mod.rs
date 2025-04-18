@@ -3,6 +3,7 @@ mod fflogs;
 mod ffprocess;
 mod ffprocesschildwrapper;
 
+pub mod ffmpegbin;
 pub mod ffcommand;
 pub mod ffdb;
 pub mod ffevent;
