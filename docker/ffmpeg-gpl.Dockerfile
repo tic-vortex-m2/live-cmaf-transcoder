@@ -9,19 +9,15 @@ RUN ./configure --enable-static --disable-doc \
 --enable-libx264 \
 --enable-libx265 \
 --enable-libxml2 \
---enable-libfdk_aac \
 --enable-libsrt \
 --enable-libfreetype \
 --enable-libfontconfig \
 --enable-libharfbuzz \
 --enable-libfribidi \
---enable-libfdk-aac \
 --enable-gnutls \
 --enable-vaapi \
 --disable-ffplay \
 --enable-gpl \
---enable-nonfree \
 --enable-ffnvcodec \
---enable-cuda-nvcc \
 --enable-libmp3lame
 RUN make -j

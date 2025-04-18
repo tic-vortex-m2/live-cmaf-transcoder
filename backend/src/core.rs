@@ -1,3 +1,4 @@
+use crate::ff::ffmpegbin::FFmpegBinList;
 /*---------------------------------------------------------------------------------------------
  *  Copyright 2024 SES
  *  Licensed under the Apache 2.0 License. See LICENSE.txt in the project root for license information.
@@ -19,14 +20,12 @@ impl Core {
     pub fn new(
         ffoutput: &std::path::Path,
         redis: dbredis::DBRedis,
-        ffmpeg: Option<String>,
-        modified_ffmpeg: bool,
+        ffmpegs: Option<FFmpegBinList>,
         server_info: Server,
     ) -> Self {
         Self {
-            ff_core: ffmpeg.map(|ffmpeg| {
-                ff::ffcore::FFCore::new(ffoutput, ffmpeg, modified_ffmpeg, server_info.clone())
-            }),
+            ff_core: ffmpegs
+                .map(|ffmpegs| ff::ffcore::FFCore::new(ffoutput, ffmpegs, server_info.clone())),
             redis: redis.clone(),
             ffdb: ffdb::FFDb::new(redis.clone()),
             server_info,

@@ -12,6 +12,7 @@ use tokio::task::JoinHandle;
 use super::ffcommand::FFCommand;
 use super::ffdb::FFDb;
 use super::fflogs::FFLogs;
+use super::ffmpegbin::FFmpegBinList;
 use super::ffprocesschildwrapper::FFProcessChildWapper;
 use super::ffstatus::FFStatus;
 
@@ -41,8 +42,7 @@ struct FFProcessActor {
     sys_info_handle: Option<JoinHandle<()>>,
     ffdb: FFDb,
     base_output: std::path::PathBuf,
-    ffmpeg: String,
-    modified_ffmpeg: bool,
+    ffmpegs: FFmpegBinList,
     status: Arc<FFStatus>,
     logs: FFLogs,
 }
@@ -53,18 +53,10 @@ impl FFProcessHolder {
         config_uid: String,
         ffdb: FFDb,
         base_output: std::path::PathBuf,
-        ffmpeg: String,
-        modified_ffmpeg: bool,
+        ffmpegs: FFmpegBinList,
     ) -> Self {
         Self {
-            process: FFProcess::new(
-                server_info,
-                config_uid,
-                ffdb,
-                base_output,
-                ffmpeg,
-                modified_ffmpeg,
-            ),
+            process: FFProcess::new(server_info, config_uid, ffdb, base_output, ffmpegs),
         }
     }
 
@@ -85,8 +77,7 @@ impl FFProcess {
         config_uid: String,
         ffdb: FFDb,
         base_output: std::path::PathBuf,
-        ffmpeg: String,
-        modified_ffmpeg: bool,
+        ffmpegs: FFmpegBinList,
     ) -> Self {
         let (sender, receiver) = mpsc::channel(10);
         let status = Arc::new(FFStatus::new(config_uid.clone()));
@@ -97,9 +88,8 @@ impl FFProcess {
             sender.clone(),
             ffdb,
             base_output,
-            ffmpeg,
+            ffmpegs,
             status.clone(),
-            modified_ffmpeg,
         );
         tokio::spawn(FFProcessActor::run(actor));
 
@@ -123,9 +113,8 @@ impl FFProcessActor {
         sender: mpsc::Sender<Message>,
         ffdb: FFDb,
         base_output: std::path::PathBuf,
-        ffmpeg: String,
+        ffmpegs: FFmpegBinList,
         status: Arc<FFStatus>,
-        modified_ffmpeg: bool,
     ) -> Self {
         let update_sender = sender.clone();
         tokio::spawn(async move {
@@ -153,10 +142,9 @@ impl FFProcessActor {
             sys_info_handle: None,
             ffdb,
             base_output,
-            ffmpeg,
+            ffmpegs,
             status,
             logs,
-            modified_ffmpeg,
         }
     }
 
@@ -215,11 +203,23 @@ impl FFProcessActor {
             return Err(new_io_error!(std::io::ErrorKind::NotFound, "GPU not found"));
         }
 
+        let ffmpeg = self.ffmpegs.find(&config);
+        if ffmpeg.is_none() {
+            self.logs
+                .push("[error] No compatible instance of FFMPEG with your config has been found")
+                .await;
+            self.status.set_state(model::corestate::CoreState::Error);
+            return Err(new_io_error!(
+                std::io::ErrorKind::NotFound,
+                "FFMPEG not found"
+            ));
+        }
+        let ffmpeg = ffmpeg.unwrap();
         let command = FFCommand::new(
             gpu.as_ref().unwrap(),
             &config,
             &self.base_output,
-            self.modified_ffmpeg,
+            ffmpeg.ast_delay_us_supported,
         );
         tracing::info!("Starting ffmpeg: {}", command);
         self.logs.push("[info] Starting Live Encoder").await;
@@ -232,7 +232,7 @@ impl FFProcessActor {
             self.status.set_state(model::corestate::CoreState::Error);
         }
 
-        let mut process = match Command::new(&self.ffmpeg)
+        let mut process = match Command::new(&ffmpeg.ffmpeg)
             .args(command.args())
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::piped())

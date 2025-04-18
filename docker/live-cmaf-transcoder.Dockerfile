@@ -23,8 +23,8 @@ RUN apt-get update && apt-get install -y \
     redis
  
 COPY --from=backend /app/target/release/live-cmaf-transcoder /usr/local/bin
-COPY --from=ffmpeg /app/ffmpeg/ffmpeg /usr/local/bin
-COPY --from=ffmpeg /app/ffmpeg/ffprobe /usr/local/bin
+COPY --from=ffmpeg-gpl /app/ffmpeg/ffmpeg /usr/local/bin/ffmpeg-gpl
+COPY --from=ffmpeg-non-free /app/ffmpeg/ffmpeg /usr/local/bin/ffmpeg-non-free
 COPY ./docker/redis.sh /opt/nvidia/entrypoint.d/94redis.sh
 
 RUN mkdir /data
@@ -33,5 +33,5 @@ RUN  echo "**** clean up ****" && \
     /var/lib/apt/lists/* \
     /var/tmp/*
 
-ENTRYPOINT ["/opt/nvidia/nvidia_entrypoint.sh", "live-cmaf-transcoder", "--ffmpeg", "/usr/local/bin/ffmpeg"]
+ENTRYPOINT ["/opt/nvidia/nvidia_entrypoint.sh", "live-cmaf-transcoder", "--ffmpeg", "/usr/local/bin/ffmpeg-non-free", "--ffmpeg", "/usr/local/bin/ffmpeg-gpl"]
     

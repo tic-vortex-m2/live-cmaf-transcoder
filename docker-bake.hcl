@@ -85,9 +85,35 @@ target "live-cmaf-transcoder-base-dev" {
     
 }
 
-target "ffmpeg" {
-    dockerfile="docker/ffmpeg.Dockerfile"
-    name="ffmpeg-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
+target "ffmpeg-gpl" {
+    dockerfile="docker/ffmpeg-gpl.Dockerfile"
+    name="ffmpeg-gpl-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
+    contexts = { 
+        cmaf-dev = "target:live-cmaf-transcoder-base-dev-nv-${item.nv-tag}"
+    }
+    matrix = {
+        item = [
+            {
+                ffmpeg-tag="7-0"
+                nv-tag="12-0"
+                ffmpeg-branch="7.0"
+            },
+            {
+                ffmpeg-tag="7-0"
+                nv-tag="11-1"
+                ffmpeg-branch="7.0"
+            }
+        ]
+    }
+    args = {
+        FFMEPG_BRANCH = "${item.ffmpeg-branch}"
+    }
+    
+}
+
+target "ffmpeg-non-free" {
+    dockerfile="docker/ffmpeg-non-free.Dockerfile"
+    name="ffmpeg-non-free-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
     contexts = { 
         cmaf-dev = "target:live-cmaf-transcoder-base-dev-nv-${item.nv-tag}"
     }
@@ -143,7 +169,8 @@ target "live-cmaf-transcoder" {
     name="live-cmaf-transcoder-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
     contexts = {
         backend = "target:backend-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
-        ffmpeg = "target:ffmpeg-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
+        ffmpeg-gpl = "target:ffmpeg-gpl-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
+        ffmpeg-non-free = "target:ffmpeg-non-free-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
         nvidia-runtime = "docker-image://${item.nvidia-runtime}"
     }
     tags = [
@@ -175,32 +202,4 @@ target "live-cmaf-transcoder" {
     
 }
 
-#target "live-cmaf-transcoder-demo" {
-#    inherits = ["_common_labels"]
-#    dockerfile="live-cmaf-transcoder-demo.Dockerfile"
-#    name="live-cmaf-transcoder-demo-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
-#    context = "./docker"
-#    contexts = {
-#        live-cmaf-transcoder = "target:live-cmaf-transcoder-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
-#    }
-#    tags = [
-#        "sessystems/live-cmaf-transcoder-demo:nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}",
-#        equal("latest","${item.tag}") ? "sessystems/live-cmaf-transcoder-demo:${item.tag}": "",
-#    ] 
-#    matrix = {
-#        item = [
-#            {
-#                nv-tag="12-0"
-#                ffmpeg-tag="7-0"
-#                tag = "latest"
-#            },
-#            {
-#                nv-tag="11-1"
-#                ffmpeg-tag="7-0"
-#                tag = ""
-#            }
-#        ]
-#    }
-#    
-#}
 

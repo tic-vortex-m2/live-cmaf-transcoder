@@ -53,6 +53,7 @@ utoipa = { version = "5.3", features = ["actix_extras", "chrono"] }
 utoipa-actix-web = "0.1"
 mime_guess = "2.0.5"
 rust-embed = "8.6"
+regex = "1.11"
 
 [build-dependencies]
 num_cpus = "1.16"

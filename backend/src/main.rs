@@ -31,6 +31,7 @@ use actix_web::{
 use clap::Parser;
 use ff::ffapi;
 
+use ff::ffmpegbin::FFmpegBinList;
 use utoipa::OpenApi;
 use utoipa_actix_web::AppExt;
 use utoipa_swagger_ui::{Config, SwaggerUi};
@@ -61,13 +62,13 @@ struct Args {
     #[arg(long, default_value = "0.0.0.0:8888")]
     bind_addr: String,
 
-    /// Path to FFMPEG binary
+    /// Path to FFMPEG binary built with GPL codecs
     #[arg(long, default_value = "ffmpeg")]
-    ffmpeg: String,
+    ffmpeg: Vec<String>,
 
-    /// Use standard ffmpeg without patches
-    #[arg(long, default_value = "false")]
-    standard_ffmpeg: bool,
+    /// Path to FFMPEG binary built with non-free codecs
+    #[arg(long)]
+    ffmpeg_non_free: Option<String>,
 
     /// Directory to store live output files (segments and manifests)
     #[arg(long)]
@@ -166,6 +167,22 @@ async fn main() -> std::io::Result<()> {
     tracing::info!("Server UID: {}", server_uid);
     tracing::info!("Server Name: {}", server_name);
 
+    let disable_transcoder = args
+        .disable_transcoder
+        .or_else(|| match get_env("DISABLE_TRANSCODER") {
+            Some(value) => value.parse::<bool>().ok(),
+            None => None,
+        })
+        .unwrap_or(false);
+
+    let mut ffmpegs: Option<FFmpegBinList> = None;
+    if !disable_transcoder {
+        let ret = FFmpegBinList::new(&args.ffmpeg)
+            .await
+            .expect("FFMpeg binary is not valid");
+        ffmpegs = Some(ret);
+    }
+
     let redis_url = args
         .redis
         .clone()
@@ -192,14 +209,6 @@ async fn main() -> std::io::Result<()> {
     }
 
     let mut service_capability = Vec::new();
-
-    let disable_transcoder = args
-        .disable_transcoder
-        .or_else(|| match get_env("DISABLE_TRANSCODER") {
-            Some(value) => value.parse::<bool>().ok(),
-            None => None,
-        })
-        .unwrap_or(false);
 
     let disable_ui = args
         .disable_ui
@@ -250,11 +259,7 @@ async fn main() -> std::io::Result<()> {
     let core = core::Core::new(
         &live_output_dir,
         redis.clone(),
-        match disable_transcoder {
-            true => None,
-            false => Some(args.ffmpeg.clone()),
-        },
-        !args.standard_ffmpeg,
+        ffmpegs,
         server_info.clone(),
     );
 
