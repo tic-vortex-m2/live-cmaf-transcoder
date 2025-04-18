@@ -85,54 +85,38 @@ target "live-cmaf-transcoder-base-dev" {
     
 }
 
-target "ffmpeg-gpl" {
-    dockerfile="docker/ffmpeg-gpl.Dockerfile"
-    name="ffmpeg-gpl-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
+target "ffmpeg" {
+    dockerfile="docker/ffmpeg-${item.variant}.Dockerfile"
+    name="ffmpeg-${item.variant}-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
     contexts = { 
         cmaf-dev = "target:live-cmaf-transcoder-base-dev-nv-${item.nv-tag}"
     }
     matrix = {
         item = [
             {
+                variant = "gpl",
                 ffmpeg-tag="7-0"
                 nv-tag="12-0"
-                ffmpeg-branch="7.0"
             },
             {
+                variant = "non-free",
+                ffmpeg-tag="7-0"
+                nv-tag="12-0"
+            },
+            {
+                variant = "gpl",
                 ffmpeg-tag="7-0"
                 nv-tag="11-1"
-                ffmpeg-branch="7.0"
+            },
+            {
+                variant = "non-free",
+                ffmpeg-tag="7-0"
+                nv-tag="11-1"
             }
         ]
     }
     args = {
-        FFMEPG_BRANCH = "${item.ffmpeg-branch}"
-    }
-    
-}
-
-target "ffmpeg-non-free" {
-    dockerfile="docker/ffmpeg-non-free.Dockerfile"
-    name="ffmpeg-non-free-nv-${item.nv-tag}-ffmpeg-${item.ffmpeg-tag}"
-    contexts = { 
-        cmaf-dev = "target:live-cmaf-transcoder-base-dev-nv-${item.nv-tag}"
-    }
-    matrix = {
-        item = [
-            {
-                ffmpeg-tag="7-0"
-                nv-tag="12-0"
-                ffmpeg-branch="7.0"
-            },
-            {
-                ffmpeg-tag="7-0"
-                nv-tag="11-1"
-                ffmpeg-branch="7.0"
-            }
-        ]
-    }
-    args = {
-        FFMEPG_BRANCH = "${item.ffmpeg-branch}"
+        FFMEPG_BRANCH = replace("${item.ffmpeg-tag}", "-", ".")
     }
     
 }
