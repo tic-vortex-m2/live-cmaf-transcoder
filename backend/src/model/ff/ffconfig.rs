@@ -67,7 +67,7 @@ impl FFConfig {
             input: Srt::new(),
             output: output.to_string_lossy().into_owned(),
             segment_duration_ms: 2000,
-            colorspace: Colorspace::BT709,
+            colorspace: Colorspace::Auto,
             deinterlace: VideoFilterDeinterlace::new(),
             video_adaptation_set: vec![VideoAdaptationSet::new()],
             audio_adaptation_set: AudioAdaptationSet::new(),

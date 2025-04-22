@@ -1,7 +1,7 @@
 use crate::model::{
     ff::{
         ffconfig::{self, Acceleration},
-        videoadaptationset::VideoAdaptationSet,
+        videoadaptationset::{Colorspace, VideoAdaptationSet},
     },
     server::Gpu,
 };
@@ -115,12 +115,14 @@ impl FFCommand {
         args.push(config.audio_adaptation_set.profile.to_string());
 
         if !config.video_adaptation_set.is_empty() {
-            args.push("-color_primaries".to_string());
-            args.push(config.colorspace.to_string());
-            args.push("-color_trc".to_string());
-            args.push(config.colorspace.to_string());
-            args.push("-colorspace".to_string());
-            args.push(config.colorspace.to_string());
+            if config.colorspace != Colorspace::Auto {
+                args.push("-color_primaries".to_string());
+                args.push(config.colorspace.to_string());
+                args.push("-color_trc".to_string());
+                args.push(config.colorspace.to_string());
+                args.push("-colorspace".to_string());
+                args.push(config.colorspace.to_string());
+            }
 
             args.push("-filter_complex".to_string());
             let mut filter_complex = String::new();

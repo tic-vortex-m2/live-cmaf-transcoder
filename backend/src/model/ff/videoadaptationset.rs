@@ -10,8 +10,9 @@ use super::{
     videofilter::VideoFilterDrawText,
 };
 
-#[derive(Clone, Deserialize, Serialize, Debug, ToSchema)]
+#[derive(Clone, Deserialize, Serialize, Debug, PartialEq, Copy, ToSchema)]
 pub enum Colorspace {
+    Auto,
     BT709,
 }
 
@@ -19,6 +20,7 @@ impl Display for Colorspace {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Colorspace::BT709 => write!(f, "bt709"),
+            Colorspace::Auto => write!(f, "auto"),
         }
     }
 }
