@@ -2,8 +2,7 @@ frontend/node_modules
 frontend/.nuxt
 frontend/.output
 frontend/dist
-cmaf-encoder/target
-cmaf-dvb-i/target
+backend/target
 target
 *.mkv
 *.mp4
