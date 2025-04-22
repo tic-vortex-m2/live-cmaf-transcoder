@@ -312,11 +312,19 @@ impl FFProcessActor {
             let mut is_running = false;
             let reader = tokio::io::BufReader::new(stdout);
             let mut lines = reader.lines();
+            let mut avg_speed_set = false;
+            let mut avg_fps_set = false;
             while let Ok(Some(line)) = lines.next_line().await {
-                if line.starts_with("avg_speed=") {
-                    let speed = line.split("avg_speed=").collect::<Vec<&str>>()[1];
+                let start_with_avg_speed = line.starts_with("avg_speed=");
+                let start_with_avg_fps = line.starts_with("avg_fps=");
+
+                if start_with_avg_speed || (!avg_speed_set && line.starts_with("speed=")) {
+                    let speed = line.split("=").collect::<Vec<&str>>()[1];
                     let speed = &speed[0..speed.len() - 1].trim();
                     let speed = speed.parse().unwrap_or(0.0);
+                    if start_with_avg_speed {
+                        avg_speed_set = true;
+                    }
 
                     if speed > 0.0 && !is_running {
                         logs.push("[info] Live Encoder is running").await;
@@ -338,10 +346,14 @@ impl FFProcessActor {
                 } else if line.starts_with("out_time_us=") {
                     let out_time_us = line.split("out_time_us=").collect::<Vec<&str>>()[1];
                     status.set_out_time_ms(out_time_us.parse().unwrap_or(0) / 1000);
-                } else if line.starts_with("avg_fps=") {
-                    let fps = line.split("avg_fps=").collect::<Vec<&str>>()[1].trim();
+                } else if start_with_avg_fps || (!avg_fps_set && line.starts_with("fps=")) {
+                    let fps = line.split("=").collect::<Vec<&str>>()[1].trim();
                     let fps = fps.parse().unwrap_or(0.0);
                     status.set_fps(fps);
+
+                    if start_with_avg_fps {
+                        avg_fps_set = true;
+                    }
                 } else if line.starts_with("progress=") && line.ends_with("end") {
                     logs.push("[error] end of the stream...").await;
                     status.set_state(model::corestate::CoreState::Error);
