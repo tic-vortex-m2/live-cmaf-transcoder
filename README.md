@@ -31,6 +31,24 @@ Follow these instructions to set up and run the transcoder.
 - **NVIDIA Container Toolkit** (optional, for NVIDIA GPU support): If using NVIDIA GPUs, install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) on your host machine.
 
 
+### Running the Transcoder using bash Script (Option 1)
+
+Download and execute the `run.sh` script from the [latest release](https://github.com/sessystems/live-cmaf-transcoder/releases/latest) to quickly start the transcoder on your machine.
+
+The script will:
+
+- Detect your hardware and enable hardware acceleration if supported  
+- Pull the latest Docker image  
+- Start the transcoder container  
+
+This is the easiest way to get up and running with minimal setup.
+
+```sh
+curl -L https://github.com/sessystems/live-cmaf-transcoder/releases/latest/download/run.sh | bash
+```
+
+### Running the Transcoder using Docker Compose (Option 2)
+
 #### 1. Download compose.yaml
 
 Get the latest `compose.yaml` file from the [latest Releases](https://github.com/sessystems/live-cmaf-transcoder/releases/latest) of the project.
@@ -47,37 +65,40 @@ Open a terminal in the same directory as your compose.yaml file and run the foll
 # Requires docker compose version >= v2.21.0
 # Check your version by running $> docker compose version
 
-docker compose pull
+docker compose --profile=all pull
 ```
 
-### Running the Transcoder using Docker Compose
+#### 3. **Set the public address of the server**
 
-#### 1. **Without Hardware Acceleration Support**
+Inform the docker container about the public IP address of the server
+
+```sh
+export BASE_URL="http://$(ip route get 1 | awk '{print $7}')" # Get IP of the default interface
+```
+
+#### 4. Run **Without Hardware Acceleration Support**
 
 To run the live-cmaf-transcoder without GPU acceleration, use the following command:
 
 ```sh
-export BASE_URL="http://$(ip route get 1 | awk '{print $7}')" # Get IP of the default interface
 docker compose up
 ```
 
-#### 2. **With Intel GPU Support**
+#### 5. Run **With Intel GPU Support**
 
 To use Intel hardware acceleration, use the command below:
 
 ```sh
-export BASE_URL="http://$(ip route get 1 | awk '{print $7}')" # Get IP of the default interface
 docker compose --profile=intel up
 ```
 
-#### 3. **With NVidia + Intel GPU Support**
+#### 6. Run **With NVidia + Intel GPU Support**
 
 For both NVIDIA and Intel GPU support.
 
 Ensure the NVIDIA Container Toolkit is installed on your host machine, then run:
 
 ```sh
-export BASE_URL="http://$(ip route get 1 | awk '{print $7}')" # Get IP of the default interface
 docker compose --profile=gpu up
 ```
 
