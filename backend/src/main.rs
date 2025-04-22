@@ -236,13 +236,13 @@ async fn main() -> std::io::Result<()> {
     .await;
 
     let live_output_dir = args.live_output.clone().unwrap_or_else(|| {
-        let temp_path: std::path::PathBuf = env::temp_dir().join("cmaf-live-output");
+        let temp_path: std::path::PathBuf = env::temp_dir().join("live-cmaf-transcoder-output");
         match temp_path.exists() {
             true => temp_path,
             false => match std::fs::create_dir_all(&temp_path) {
                 Ok(_) => temp_path,
                 Err(_) => {
-                    tracing::error!("Fail to create live output directory");
+                    tracing::error!("Fail to create live output directory {:?}", temp_path);
                     temp_path
                 }
             },
