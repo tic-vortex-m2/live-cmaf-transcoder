@@ -26,6 +26,7 @@ x-live-cmaf-transcoder: &live-cmaf-transcoder
     - /etc/machine-id:/etc/machine-id
     - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id
     - data:/data
+    - ramdisk:/tmp
   ports:
     - "${SERVER_PORT-80}:8888"
     - "${REDIS_PORT-6379}:6379"
@@ -39,7 +40,7 @@ x-live-cmaf-transcoder: &live-cmaf-transcoder
     - "DISABLE_TRANSCODER=${DISABLE_TRANSCODER:-}"
     - "DISABLE_UI=${DISABLE_UI:-}"
     - "RUST_LOG=warn"
-      
+    
 services:
 
   live-cmaf-transcoder-no-gpu:
