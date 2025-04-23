@@ -98,7 +98,7 @@ jobs:
         run: df . -h
 
       - name: Cleanup Docker images
-        run: docker image prune || true
+        run: docker image prune -f || true
 
       - name: Check disk space
         run: df . -h
