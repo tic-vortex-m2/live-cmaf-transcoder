@@ -40,6 +40,11 @@ jobs:
         with:
           command: test
 
+      - name: Cleanup Test
+        uses: actions-rs/cargo@v1
+        with:
+          command: clean
+
       - name: Bump to new version 
         run: |
           cargo set-version ${VERSION}
@@ -81,14 +86,22 @@ jobs:
         with:
           config: .github/buildkitd.toml
 
-      -
-        name: Build and Push Docker images
+      - name: Build and Push Docker images
         uses: docker/bake-action@v6
         with:
           builder: ${{ steps.buildx.outputs.name }}
           files: docker-bake.hcl
           targets: all
           push: true
+
+      - name: Check disk space
+        run: df . -h
+
+      - name: Cleanup Docker images
+        run: docker rmi $(docker image ls -aq)
+
+      - name: Check disk space
+        run: df . -h
 
       - name: Pull Docker image
         run: docker pull ${DOCKER_IMAGE}
