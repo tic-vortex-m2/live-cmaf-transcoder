@@ -34,7 +34,7 @@ template: |
   curl -L https://github.com/sessystems/live-cmaf-transcoder/releases/latest/download/run.sh | bash
   ```
 
-  For more information, check out the [README](https://github.com/sessystems/live-cmaf-transcoder) for for information
+  For more information, check out the [README](https://github.com/sessystems/live-cmaf-transcoder)
 
   ## Changes
 
