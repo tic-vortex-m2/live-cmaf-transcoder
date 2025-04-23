@@ -26,6 +26,16 @@ version-resolver:
       - 'patch'
   default: patch
 template: |
+  ## 🚀 Quick Start
+
+  To quickly launch the **Live CMAF Transcoder** on your machine, download and execute the `run.sh` script:
+
+  ```sh
+  curl -L https://github.com/sessystems/live-cmaf-transcoder/releases/latest/download/run.sh | bash
+  ```
+
+  For more information, check out the [README](https://github.com/sessystems/live-cmaf-transcoder) for for information
+
   ## Changes
 
   $CHANGES
