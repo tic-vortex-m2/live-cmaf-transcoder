@@ -1,31 +1,32 @@
+
+now = timestamp()
+authors = "Yannick Poirier <yannick.poirier@ses.com>; Xavier Scholtes <xavier.scholtes@ses.com>"
+url = "https://github.com/sessystems/live-cmaf-transcoder"
+description = "Re-encode live streams into the Common Media Application Format (CMAF).\nOutput streams in both DASH and HLS.\nIt uses hardware acceleration (GPUs)."
+
 target "_common_labels" {
-    labels = {
-        "maintainer"="SES Engineering (Luxembourg)"
-        # The date and time on which the image was built (string, RFC 3339 date-time).
-        "org.opencontainers.image.created" = "${timestamp()}"
-        # Contact details of the people or organization responsible for the image (freeform string).
-        "org.opencontainers.image.authors" = "Yannick Poirier <yannick.poirier@ses.com>; Xavier Scholtes <xavier.scholtes@ses.com>"
-        # URL to find more information on the image (string).
-        "org.opencontainers.image.url" = ""
-        # URL to get documentation on the image (string).
-        "org.opencontainers.image.documentation" = ""
-        # URL to the source code for building the image (string).
-        "org.opencontainers.image.source" = ""
-        # Version of the packaged software (string).
-        "org.opencontainers.image.version" = "0.0.1"
-        # Source control revision identifier for the image (string).
-        "org.opencontainers.image.revision" = ""
-        # Name of the distributing entity, organization, or individual (string).
-        "org.opencontainers.image.vendor" = "SES Engineering (Luxembourg)"
-        # License(s) under which contained software is distributed (string, SPDX License List).
-        "org.opencontainers.image.licenses" = "Apache-2.0"
-        # Name of the reference for a target (string).
-        "org.opencontainers.image.ref.name" = ""
-        # Human-readable title of the image (string).
-        "org.opencontainers.image.title" = "live-cmaf-transcoder"
-        # Human-readable description of the software packaged in the image (string).
-        "org.opencontainers.image.description" = "Re-encode live streams into the Common Media Application Format (CMAF).\nOutput streams in both DASH and HLS.\nIt uses hardware acceleration (GPUs)."
-    }
+    annotations = [
+    "index,manifest:org.opencontainers.image.created=${now}",
+    "index,manifest:org.opencontainers.image.url=${url}",
+    "index,manifest:org.opencontainers.image.source=${url}",
+    "index,manifest:org.opencontainers.image.vendor=${authors}",
+    "index,manifest:org.opencontainers.image.title=live-cmaf-transcoder",
+    "index,manifest:org.opencontainers.image.description=${description}",
+    "index,manifest:org.opencontainers.image.documentation=${url}",
+    "index,manifest:org.opencontainers.image.authors=${authors}",
+    "index,manifest:org.opencontainers.image.licenses=Apache-2.0",
+  ]
+  labels = {
+    "org.opencontainers.image.created" = "${now}",
+    "org.opencontainers.image.url" = "${url}",
+    "org.opencontainers.image.source" = "${url}",
+    "org.opencontainers.image.vendor" = "${authors}",
+    "org.opencontainers.image.title" = "live-cmaf-transcoder",
+    "org.opencontainers.image.description" = "${description}",
+    "org.opencontainers.image.documentation" = "${url}",
+    "org.opencontainers.image.authors" = "${authors}",
+    "org.opencontainers.image.licenses" = "Apache-2.0"
+  }
 }
 
 variable "REGISTRY_DOCKER" {
