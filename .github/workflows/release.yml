@@ -90,6 +90,9 @@ jobs:
           targets: all
           push: true
 
+      - name: Pull Docker image
+        run: docker pull ${DOCKER_IMAGE}
+
       - name: Save Docker Image to tar file
         run: docker save ${DOCKER_IMAGE} | xz -T0 -c > ${IMAGE_FILENAME}
 
