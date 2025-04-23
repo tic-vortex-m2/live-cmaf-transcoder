@@ -40,10 +40,16 @@ jobs:
         with:
           command: test
 
+      - name: Check disk space
+        run: df . -h
+
       - name: Cleanup Test
         uses: actions-rs/cargo@v1
         with:
           command: clean
+
+      - name: Check disk space
+        run: df . -h
 
       - name: Bump to new version 
         run: |
