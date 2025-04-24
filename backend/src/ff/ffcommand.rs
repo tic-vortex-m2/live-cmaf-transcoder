@@ -192,9 +192,6 @@ impl FFCommand {
         args.push("-update_period".to_string());
         args.push(segment_duration.to_string());
 
-        args.push("-streaming".to_string());
-        args.push("1".to_string());
-
         args.push("-media_seg_name".to_string());
         args.push(config.media_seg_name.to_string());
 
