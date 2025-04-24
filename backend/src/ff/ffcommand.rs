@@ -228,7 +228,7 @@ impl FFCommand {
         args.push(format_options);
 
         args.push("-mpd_profile".to_string());
-        args.push("dash".to_string());
+        args.push("dvb_dash".to_string());
 
         args.push("-f".to_string());
         args.push("dash".to_string());
