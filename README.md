@@ -26,6 +26,13 @@ Follow these instructions to set up and run the transcoder.
 
 ### Prerequisites
 
+Ensure your system meets the following requirements: 
+
+
+- **Operating System**: A Linux machine with at least 2GB of RAM and 10GB of storage. 
+- **Hardware Acceleration (optional):** 
+    - Intel® processor 7th generation or newer with Intel® Graphics Technology. 
+    - NVidia GeForce, RTX, Quadro, or Tesla with NVENC support. 
 - **Docker**: Ensure that Docker is installed on your machine. You can find the installation guide [here](https://docs.docker.com/get-docker/).
 - **Docker compose**: Used to define and manage multi-container applications. You can find the installation guide [here](https://docs.docker.com/compose/install/linux/). Requires version >= v2.21.0.
 - **NVIDIA Container Toolkit** (optional, for NVIDIA GPU support): If using NVIDIA GPUs, install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) on your host machine.
@@ -40,6 +47,10 @@ The script will:
 - Detect your hardware and enable hardware acceleration if supported  
 - Pull the latest Docker image  
 - Start the transcoder container  
+
+be sure that the following tools are available on your machine to properly detect the hardware capability:
+- **vainfo:** Tools to check VAAPI support  
+- **nvidia-smi:** Tools to check NVEnc support 
 
 This is the easiest way to get up and running with minimal setup.
 
