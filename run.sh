@@ -7,89 +7,125 @@ YELLOW="\033[1;33m"
 BLUE="\033[1;34m"
 NC="\033[0m" # No Color
 
-info()    { echo -e "${GREEN}✅${NC}  $1"; }
-success() { echo -e "${GREEN}✅${NC}  $1"; }
-warn()    { echo -e "${YELLOW}⚠️ ${NC}  $1"; }
-error()   { echo -e "${RED}❌${NC}  $1"; }
+info()    { local indent="${2:-}"; echo -e "${indent}${BLUE}[+]${NC} $1"; }
+success() { local indent="${2:-}"; echo -e "${indent}${GREEN}✔${NC} $1"; }
+warn()    { local indent="${2:-}"; echo -e "${indent}${YELLOW}⚠️ ${NC} $1"; }
+error()   { local indent="${2:-}"; echo -e "${indent}${RED}❌${NC} $1"; }
 
 has_intel() {
 
+    local indent=" "
     if ! command -v vainfo &> /dev/null; then
-        error "vainfo tool is not installed. Please install it to correctly detect your GPUs."
+        error "Missing 'vainfo' tool. Please install it to detect Intel GPUs." "$indent"
         return 1
     fi
 
     va_info=$(vainfo --display drm | grep VAProfileH264Main)
     if [[ -n "$va_info" ]]; then
-        success "VAAPI GPU detected"
+        success "Intel VAAPI GPU detected." "$indent"
         return 0
     else
-        warn "No VAAPI GPU detected"
+        warn "No Intel VAAPI GPU detected." "$indent"
         return 1
     fi
 }
 has_nvidia() {
 
+    local indent=" "
     if ! command -v nvidia-smi &> /dev/null; then
-        error "nvidia-smi tool is not installed. Please install it to correctly detect NVIDIA GPUs."
+        error "Missing 'nvidia-smi' tool. Please install it to detect NVIDIA GPUs." "$indent"
         return 1
     fi
 
-    nvidia_info=$(nvidia-smi --query-gpu=index,name,uuid --format=csv,noheader)
+    local nvidia_info=$(nvidia-smi --query-gpu=index,name,uuid --format=csv,noheader)
     if [[ -n "$nvidia_info" ]]; then
-        success "NVIDIA GPU detected"
-        return 0
+        success "NVIDIA GPU detected." "$indent"
     else
-        warn "No NVIDIA GPU detected"
+        warn "No NVIDIA GPU detected." "$indent"
         return 1
     fi
+
+    if ! command -v nvidia-container-toolkit &> /dev/null; then
+        warn "NVIDIA Container Toolkit is not installed. NVIDIA GPU acceleration may not work inside Docker." "$indent"
+        return 1
+    fi
+    success "NVIDIA Container Toolkit detected." "$indent"
+    return 0
 }
 
 has_docker() {
-    info "Verifying Docker installation..."
+    local indent=" "
+    info "Checking Docker installation..."
     if ! command -v docker &> /dev/null; then
-        error "Docker is not installed. Please install Docker and try again."
+        error "Docker is not installed. Please install Docker and try again." "$indent"
         return 1
     fi
 
     if ! docker info &> /dev/null; then
-        error "Docker is not running or current user lacks access. Please start Docker or fix permissions."
+        error "Docker is not running or current user lacks access. Please start Docker or fix permissions." "$indent"
         return 1
     fi
-    success "Docker is available"
+
+    
+    if ! docker compose version &> /dev/null; then
+        error "Docker compose is not install. Please install Docker compose and try again." "$indent"
+        return 1
+    fi
+
+    local docker_compose_version=$(docker compose version --short)
+    if [ "$(printf '%s\n' "2.21.0" "$docker_compose_version" | sort -V | head -n1)" != "2.21.0" ]; then
+        error "Docker Compose version must be >= 2.21.0. Found: $docker_compose_version"
+        return 1
+    fi
+    success "docker compose version: $docker_compose_version >= 2.21.0" "$indent"
+
+    success "Docker is available" "$indent"
     return 0
 }
 
-info "live-cmaf-transcoder auto-install"
-
+echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+echo -e "${BLUE}║        🚀 Starting live-cmaf-transcoder       ║${NC}"
+echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+echo ""
 
 has_docker || {
     error "Docker is not installed or not running. Please install Docker and try again."
     exit 1
 }
 
-info "Checking for GPU support..."
+info "Checking GPU support..."
 profile="cpu"
-if has_nvidia; then
-    profile="gpu"
-elif has_intel; then
+if has_intel; then
     profile="intel"
 fi
-success "Selecting profile: $profile"
+if has_nvidia; then
+    profile="gpu"
+fi
+success "Selecting profile: $profile" " "
 
-info "Updating to latest version of the cmaf-list-transcoder..."
+info "Fetching latest version of the live-cmaf-transcoder..."
 if ! curl -fsSL -o compose.yaml https://github.com/sessystems/live-cmaf-transcoder/releases/latest/download/compose.yaml; then
     error "Failed to download compose.yaml"
     exit 1
 fi
 
-success "Stopping and removing existing containers..."
+info "Stopping and removing any existing containers..."
 docker compose --profile=all down || true
 
-success "Pulling latest container images..."
-docker compose pull
+info "Pulling the latest container images..."
+docker compose --profile=all pull
 
-info "Starting containers using '${profile}' profile..."
+info "Starting containers using profile '${profile}'..."
 export BASE_URL="http://$(ip route get 1 | awk '{print $7}')"
-docker compose --profile=${profile} up -d
-success "Containers started. Application is available at: ${BASE_URL}"
+docker compose --profile=${profile} up -d || {
+    error "Failed to start Docker containers."
+    exit 1
+}
+
+echo ""
+echo -e "${BLUE}╔═════════════════════════════════════════════════════════════╗${NC}"
+echo -e "                           ${GREEN}\033[1m🎉 All done!\033[0m${NC}"
+echo -e "  🌐  Web Application:    ${GREEN}${BASE_URL}${NC}"
+echo -e "  🧹  To stop containers: ${YELLOW}docker compose --profile=all down${NC}"
+echo -e "  🚀  To start again:     ${YELLOW}docker compose --profile=${profile} up -d${NC}"
+echo -e "${BLUE}╚═════════════════════════════════════════════════════════════╝${NC}"
