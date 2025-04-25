@@ -174,7 +174,6 @@ SERVER_UID=2 \
 REDIS_URL=redis://:1234@192.168.1.1:6379 \
 REDIS_SERVICE_DISABLED=true \
 DISABLE_UI=true \
-SERVER_PORT=81 \
 docker compose --profile=gpu up
 ```
 
