@@ -148,7 +148,7 @@ Below is a step-by-step example of how to configure two servers to work as a clu
 
 | Server   | Type      | IP Address     |
 |----------|-----------|----------------|
-| Server 1 | Primary node (transcoder + redis)  | `192.168.1.1`  |
+| Server 1 | Primary node (transcoder + redis + management UI)  | `192.168.1.1`  |
 | Server 2 | Joining node (transcoder only)  | `192.168.1.2`  |
 
 #### Step 1 — Start the Primary Instance on Server 1
