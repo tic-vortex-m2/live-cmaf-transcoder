@@ -127,15 +127,15 @@ The following environment variables can be used with Docker Compose to configure
 
 | Env                    | Description             | Example        |
 |------------------------|-------------------------|----------------|
-| `BASE_URL`             | Public base URL of this server.<br>If not set, defaults to `http://localhost`. | `BASE_URL=https://www.live-cmaf-transcoder.com docker compose up`  |
+| `BASE_URL`             | Public base URL of this server instance.<br>If not set, defaults to `http://localhost`. | `BASE_URL=https://www.live-cmaf-transcoder.com docker compose up`  |
 | `SERVER_NAME`  | Human-readable name for this server instance.<br>If not set, defaults to the machine’s hostname. | `SERVER_NAME=my-server-1 docker compose up`                                                 |
-| `SERVER_UID`           | Unique identifier for this server instance.<br>Must be different for each instance sharing the same Redis database.<br>Once set, it should not be changed—doing so may result in loss of the associated configuration.<br>Defaults to the machine's Linux ID. | `SERVER_UID=1234 docker compose up`                                                         |
-| `SERVER_PORT`          | Port on which the web server will be exposed by Docker Compose.<br>If not set, defaults to `80`. | `SERVER_PORT=8080 docker compose up` |
-| `REDIS_URL`            | Connection URL of the Redis database.<br>Use this to connect to an external Redis instance and form a cluster of transcoder servers.<br>If not set, connects to the internal Redis container.                                  | `REDIS_URL=redis://192.168.1.1:6379 docker compose up`                                      |
-| `REDIS_SERVICE_DISABLED` | Disables the internal Redis container when set to `'true'` or `'1'`.<br>Useful when connecting to an external Redis via `REDIS_URL`. | `REDIS_SERVICE_DISABLED=true REDIS_URL=redis://192.168.1.1:6379 docker compose up` |
-| `REDIS_PASSWORD`       | Password for securing the internal Redis instance.<br>Only applies when using the internal Redis container.  | `REDIS_PASSWORD=1234 docker compose up` |
+| `SERVER_UID`           | Unique identifier for this server instance.<br>Must be different for each instance sharing the same Redis database.<br>Once set, it should not be changed, doing so may result in loss of the associated configuration.<br>Defaults to the machine's Linux ID. | `SERVER_UID=1234 docker compose up`                                                         |
+| `SERVER_PORT`          | Port on which the web server will be publicly exposed with Docker Compose.<br>If not set, defaults to `80`. | `SERVER_PORT=8080 docker compose up` |
+| `REDIS_URL`            | Connection URL of the Redis database.<br>Use this to connect to an external Redis instance and create a cluster of transcoder servers.<br>If not set, connects to the internal Redis server running inside the docker container.                                  | `REDIS_URL=redis://192.168.1.1:6379 docker compose up`                                      |
+| `REDIS_SERVICE_DISABLED` | when set to `'true'` or `'1'` it disables the internal Redis database running inside the docker container.<br>Useful when connecting to an external Redis via `REDIS_URL`. | `REDIS_SERVICE_DISABLED=true REDIS_URL=redis://192.168.1.1:6379 docker compose up` |
+| `REDIS_PASSWORD`       | Password for securing the internal Redis database instance.<br>Only applies when using the internal Redis database running inside the docker container.  | `REDIS_PASSWORD=1234 docker compose up` |
 | `REDIS_PORT`          | Port on which the redis server will be exposed by Docker Compose.<br>If not set, defaults to `6379`. | `REDIS_PORT=6380 docker compose up` |
-| `DISABLE_TRANSCODER`  | Set to `true` to run the server without transcoder capability. Useful to serve only the management UI. | `DISABLE_TRANSCODER=true docker compose up` |
+| `DISABLE_TRANSCODER`  | Set to `true` to run the server without any transcoder capability. Useful to serve only the management UI. | `DISABLE_TRANSCODER=true docker compose up` |
 | `DISABLE_UI`  | Set to `true` to disable the management UI. Useful for joining a cluster that already includes a UI server. | `DISABLE_UI=true docker compose up` |
 
 ### Setting Up a Cluster of Transcoders
@@ -148,7 +148,7 @@ Below is a step-by-step example of how to configure two servers to work as a clu
 
 | Server   | Type      | IP Address     |
 |----------|-----------|----------------|
-| Server 1 | Primary node (transcoder + redis)  | `192.168.1.1`  |
+| Server 1 | Primary node (transcoder + redis + management UI)  | `192.168.1.1`  |
 | Server 2 | Joining node (transcoder only)  | `192.168.1.2`  |
 
 #### Step 1 — Start the Primary Instance on Server 1
@@ -174,7 +174,6 @@ SERVER_UID=2 \
 REDIS_URL=redis://:1234@192.168.1.1:6379 \
 REDIS_SERVICE_DISABLED=true \
 DISABLE_UI=true \
-SERVER_PORT=81 \
 docker compose --profile=gpu up
 ```
 
