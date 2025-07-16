@@ -1,5 +1,5 @@
 <template>
-  <v-card elevation="0">
+  <v-card elevation="0" class="my-2">
     <v-card-title> Input Stream </v-card-title>
 
     <v-card-text>
@@ -16,7 +16,7 @@
         <v-col>
           <v-text-field
             v-model="config.input.uri"
-            label="URL (srt|udp|http://<ip>:<port>)"
+            label="URL (srt|udp|rtp|http://<ip>:<port>)"
             variant="underlined"
             density="compact"
           />
@@ -44,6 +44,18 @@
             density="compact"
           />
         </v-col>
+        <v-col>
+          <v-text-field
+            v-model.number="srtLatencyMs"
+            type="number"
+            label="Latency (SRT Only)"
+            suffix="milliseconds"
+            :disabled="config.input.uri.startsWith('srt://') === false"
+            variant="underlined"
+            density="compact"
+            hint="receiver delay to absorb bursts of missed packet retransmissions"
+          />
+        </v-col>
       </v-row>
 
       <v-row dense>
@@ -59,9 +71,7 @@
           <v-select
             v-model="gpu"
             :items="gpuList"
-            :rules="[
-              () => gpu != undefined || 'Please select the acceleration',
-            ]"
+            :rules="[() => gpu != undefined || 'Please select the acceleration']"
             label="Acceleration"
             variant="underlined"
             density="compact"
@@ -100,5 +110,14 @@ const gpuList = computed(() => {
       value: gpu,
     })) ?? []
   );
+});
+
+const srtLatencyMs = computed({
+  get: () => {
+    return config.value.input.srtLatencyUs / 1000;
+  },
+  set: (value: number) => {
+    config.value.input.srtLatencyUs = value * 1000;
+  },
 });
 </script>

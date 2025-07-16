@@ -49,7 +49,6 @@ The script will:
 - Start the transcoder container  
 
 be sure that the following tools are available on your machine to properly detect the hardware capability:
-- **vainfo:** Tools to check VAAPI support  
 - **nvidia-smi:** Tools to check NVEnc support 
 
 This is the easiest way to get up and running with minimal setup.
@@ -95,17 +94,17 @@ To run the live-cmaf-transcoder without GPU acceleration, use the following comm
 docker compose up
 ```
 
-#### 5. Run **With Intel GPU Support**
+#### 5. Run **With Direct Rendering Manager (DRM) GPU Support**
 
-To use Intel hardware acceleration, use the command below:
+To use DRM hardware acceleration, use the command below:
 
 ```sh
-docker compose --profile=intel up
+docker compose --profile=drm up
 ```
 
-#### 6. Run **With NVidia + Intel GPU Support**
+#### 6. Run **With NVidia + DRM GPU Support**
 
-For both NVIDIA and Intel GPU support.
+For both NVIDIA and DRM GPU support.
 
 Ensure the NVIDIA Container Toolkit is installed on your host machine, then run:
 
@@ -128,6 +127,7 @@ The following environment variables can be used with Docker Compose to configure
 | Env                    | Description             | Example        |
 |------------------------|-------------------------|----------------|
 | `BASE_URL`             | Public base URL of this server instance.<br>If not set, defaults to `http://localhost`. | `BASE_URL=https://www.live-cmaf-transcoder.com docker compose up`  |
+| `BIND_ADDR`            | Specifies the IP address and port of the network interface where the web server should bind to.<br>If not set, defaults to `0.0.0.0:80`. | `BIND_ADDR=192.168.1.1:8080 docker compose up`  |
 | `SERVER_NAME`  | Human-readable name for this server instance.<br>If not set, defaults to the machine’s hostname. | `SERVER_NAME=my-server-1 docker compose up`                                                 |
 | `SERVER_UID`           | Unique identifier for this server instance.<br>Must be different for each instance sharing the same Redis database.<br>Once set, it should not be changed, doing so may result in loss of the associated configuration.<br>Defaults to the machine's Linux ID. | `SERVER_UID=1234 docker compose up`                                                         |
 | `SERVER_PORT`          | Port on which the web server will be publicly exposed with Docker Compose.<br>If not set, defaults to `80`. | `SERVER_PORT=8080 docker compose up` |
@@ -137,6 +137,7 @@ The following environment variables can be used with Docker Compose to configure
 | `REDIS_PORT`          | Port on which the redis server will be exposed by Docker Compose.<br>If not set, defaults to `6379`. | `REDIS_PORT=6380 docker compose up` |
 | `DISABLE_TRANSCODER`  | Set to `true` to run the server without any transcoder capability. Useful to serve only the management UI. | `DISABLE_TRANSCODER=true docker compose up` |
 | `DISABLE_UI`  | Set to `true` to disable the management UI. Useful for joining a cluster that already includes a UI server. | `DISABLE_UI=true docker compose up` |
+| `SERVER_VERSION`  | Select the version of the server to run. <br>If not set, defaults to `latest` | `SERVER_VERSION=0.1.60 docker compose up` |
 
 ### Setting Up a Cluster of Transcoders
 
